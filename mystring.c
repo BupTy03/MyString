@@ -6,6 +6,8 @@
 
 MyString* newMyStringOfSize(int size)
 {
+	assert(size > 0);
+
 	MyString* resultString = (MyString*)malloc(sizeof(MyString));
 
 	char* pChars = (char*)calloc((MY_STRING_HEADER_SIZE + size + 1), sizeof(char));
@@ -39,9 +41,16 @@ int isMyStringEmpty(MyString* myString)
 {
 	return (int)(sizeOfMyString(myString) > 0);
 }
+
+static int isInRange(int index, int rangeSize)
+{
+	return (int)(index >= 0 && index < rangeSize);
+}
+
 char getCharAtMyString(MyString* myString, int index)
 {
-	assert(index >= 0 && index < sizeOfMyString(myString));
+	assert(myString);
+	assert(isInRange(index, sizeOfMyString(myString)));
 	return myString->data[index];
 }
 void setCharAtMyString(MyString* myString, int index, char val)
@@ -50,7 +59,50 @@ void setCharAtMyString(MyString* myString, int index, char val)
 	myString->data[index] = val;
 }
 
-void deleteString(MyString* myString)
+MyString* subStrOfMyString(MyString* myString, int beginIndex, int endIndex)
+{
+	assert(isInRange(beginIndex, sizeOfMyString(myString)));
+	assert(isInRange(endIndex, sizeOfMyString(myString)));
+
+	const int newStringSize = endIndex - beginIndex;
+	MyString* pResult = newMyStringOfSize(newStringSize);
+	assert(pResult);
+
+	memcpy(pResult->data, (myString->data + beginIndex), newStringSize);
+	return pResult;
+}
+
+MyString* cloneMyString(MyString* myString)
+{
+	return subStrOfMyString(myString, 0, sizeOfMyString(myString));
+}
+
+MyString* concatenateMyStrings(MyString* leftString, MyString* rightString)
+{
+	assert(leftString);
+	assert(rightString);
+
+	const int sizeOfLeftStr = sizeOfMyString(leftString);
+	const int sizeOfRightStr = sizeOfMyString(rightString);
+	assert(sizeOfLeftStr >= 0);
+	assert(sizeOfRightStr >= 0);
+
+	if(0 == sizeOfLeftStr)
+		return cloneMyString(rightString);
+	if(0 == sizeOfRightStr)
+		return cloneMyString(leftString);
+
+	const int sizeOfResultStr = sizeOfLeftStr + sizeOfRightStr;
+	MyString* pResult = newMyStringOfSize(sizeOfResultStr);
+	assert(pResult);
+
+	memcpy(pResult->data, leftString->data, sizeOfLeftStr);
+	memcpy(pResult->data + sizeOfLeftStr, rightString->data, sizeOfResultStr);
+
+	return pResult;
+}
+
+void deleteMyString(MyString* myString)
 {
 	assert(myString);
 	assert(myString->data);
