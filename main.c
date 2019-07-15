@@ -23,5 +23,6 @@ int main(int argc, char* argv[])
 	deleteMyString(str);
 	deleteMyString(leftStr);
 	deleteMyString(rightStr);
+	deleteMyString(concatenatedStr);
 	return(0);
 }
